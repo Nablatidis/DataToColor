@@ -37,12 +37,12 @@ local GetInventoryItemLink = GetInventoryItemLink
 local IsSpellInRange = IsSpellInRange
 local GetSpellInfo = GetSpellInfo
 local GetActionCooldown = GetActionCooldown
-local IsUsableItem = IsUsableItem or C_Item.IsUsableItem
+local IsUsableItem = IsUsableItem or (C_Item and C_Item.IsUsableItem)
 local IsUsableAction = IsUsableAction
 local IsCurrentAction = IsCurrentAction
 local IsAutoRepeatAction = IsAutoRepeatAction
 
-local IsUsableSpell = IsUsableSpell or C_Spell.IsUsableSpell
+local IsUsableSpell = IsUsableSpell or (C_Spell and C_Spell.IsSpellUsable)
 
 local GetNumSkillLines = GetNumSkillLines
 local GetSkillLineInfo = GetSkillLineInfo
@@ -547,7 +547,7 @@ function DataToColor:isActionUseable(min, max)
       isUsableBits = isUsableBits + (2 ^ (slot - min))
     end
 
-    if enabled == 1 and start ~= 0 and (duration * 1000) > gcdMs and not DataToColor.actionBarCooldownQueue:exists(slot) then
+    if (enabled == 1 or enabled == true) and start ~= 0 and (duration * 1000) > gcdMs and not DataToColor.actionBarCooldownQueue:exists(slot) then
       DataToColor.actionBarCooldownQueue:set(slot, start + duration)
     end
   end

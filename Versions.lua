@@ -93,6 +93,38 @@ do
     if G.UnitDebuff == nil then G.UnitDebuff = make(C_UnitAuras.GetDebuffDataByIndex, "HARMFUL") end
   end
 
+  -- spells / items moved into C_ namespaces
+  alias("IsUsableSpell", "C_Spell", "IsSpellUsable")
+  alias("IsUsableItem", "C_Item", "IsUsableItem")
+  alias("IsSpellKnown", "C_SpellBook", "IsSpellKnown")
+  alias("GetSpellBaseCooldown", "C_Spell", "GetSpellBaseCooldown")
+
+  -- action bar functions moved into C_ActionBar
+  alias("GetActionTexture", "C_ActionBar")
+  alias("GetActionInfo", "C_ActionBar")
+  alias("HasAction", "C_ActionBar")
+  alias("IsUsableAction", "C_ActionBar")
+  alias("IsCurrentAction", "C_ActionBar")
+  alias("IsAutoRepeatAction", "C_ActionBar")
+  if G.GetActionCooldown == nil and G.C_ActionBar and G.C_ActionBar.GetActionCooldown then
+    local f = G.C_ActionBar.GetActionCooldown
+    G.GetActionCooldown = function(slot)
+      local a, b, c, d = f(slot)
+      if type(a) == "table" then
+        return a.startTime, a.duration, a.isEnabled, a.modRate
+      end
+      return a, b, c, d
+    end
+  end
+
+  -- combo points: modern clients read them through UnitPower
+  if G.GetComboPoints == nil then
+    G.GetComboPoints = function(unit, target)
+      local e = G.Enum and G.Enum.PowerType
+      return G.UnitPower(unit or "player", e and e.ComboPoints or 4)
+    end
+  end
+
   -- no equivalent in this client: safe empty answers so the addon keeps running
   local function stub(name, fn) if G[name] == nil then G[name] = fn end end
   stub("GetNumTalentTabs", function() return 0 end)
@@ -102,6 +134,142 @@ do
   stub("GetSkillLineInfo", function() return nil end)
   stub("GetPetHappiness", function() return nil end)
   stub("GetRuneType", function() return nil end)
+  stub("GetSpellBaseCooldown", function() return nil end)
+end
+
+--------------------------------------------------------------------------------
+-- /dcapi : list game functions the addon uses that this client doesn't have
+--------------------------------------------------------------------------------
+local REQUIRED_API = {
+  "AcceptGroup",
+  "CanMerchantRepair",
+  "CheckInteractDistance",
+  "ClearSendMail",
+  "ClickSendMailItemButton",
+  "DeclineGroup",
+  "DeleteCursorItem",
+  "GetActionCooldown",
+  "GetActionInfo",
+  "GetActionTexture",
+  "GetAddOnCPUUsage",
+  "GetBindingKey",
+  "GetBuildInfo",
+  "GetCVarBool",
+  "GetCoinTextureString",
+  "GetComboPoints",
+  "GetCorpseRecoveryDelay",
+  "GetCurrentBindingSet",
+  "GetInventoryItemBroken",
+  "GetInventoryItemCount",
+  "GetInventoryItemDurability",
+  "GetInventoryItemID",
+  "GetInventoryItemLink",
+  "GetInventorySlotInfo",
+  "GetItemInfo",
+  "GetMacroInfo",
+  "GetMacroItem",
+  "GetMacroSpell",
+  "GetMerchantItemLink",
+  "GetMirrorTimerInfo",
+  "GetMoney",
+  "GetNetStats",
+  "GetNumLootItems",
+  "GetNumSkillLines",
+  "GetNumTalentTabs",
+  "GetNumTalents",
+  "GetPetActionInfo",
+  "GetPetHappiness",
+  "GetPlayerFacing",
+  "GetRepairAllCost",
+  "GetRuneCooldown",
+  "GetRuneType",
+  "GetSendMailItem",
+  "GetShapeshiftForm",
+  "GetShapeshiftFormInfo",
+  "GetSkillLineInfo",
+  "GetSpellBaseCooldown",
+  "GetSpellBookItemName",
+  "GetSpellBookItemTexture",
+  "GetSpellInfo",
+  "GetSpellPowerCost",
+  "GetTalentInfo",
+  "GetTime",
+  "GetUnitName",
+  "GetUnitSpeed",
+  "GetWeaponEnchantInfo",
+  "HasAction",
+  "HasPetUI",
+  "InCombatLockdown",
+  "IsAutoRepeatAction",
+  "IsAutoRepeatSpell",
+  "IsBagOpen",
+  "IsCurrentAction",
+  "IsCurrentSpell",
+  "IsFalling",
+  "IsFlying",
+  "IsInGroup",
+  "IsIndoors",
+  "IsMounted",
+  "IsSpellInRange",
+  "IsSpellKnown",
+  "IsStealthed",
+  "IsSwimming",
+  "IsUsableAction",
+  "IsUsableItem",
+  "IsUsableSpell",
+  "RepairAllItems",
+  "RepopMe",
+  "ResetCPUUsage",
+  "RetrieveCorpse",
+  "SaveBindings",
+  "SendMail",
+  "SetBinding",
+  "SetSendMailMoney",
+  "UnitAffectingCombat",
+  "UnitAttackSpeed",
+  "UnitBuff",
+  "UnitCastingInfo",
+  "UnitChannelInfo",
+  "UnitClass",
+  "UnitClassification",
+  "UnitDebuff",
+  "UnitExists",
+  "UnitGUID",
+  "UnitHealth",
+  "UnitHealthMax",
+  "UnitIsDead",
+  "UnitIsDeadOrGhost",
+  "UnitIsFriend",
+  "UnitIsGhost",
+  "UnitIsPlayer",
+  "UnitIsTapDenied",
+  "UnitIsTrivial",
+  "UnitIsUnit",
+  "UnitIsVisible",
+  "UnitLevel",
+  "UnitName",
+  "UnitOnTaxi",
+  "UnitPlayerControlled",
+  "UnitPower",
+  "UnitPowerMax",
+  "UnitRace",
+  "UnitRangedDamage",
+  "UnitReaction",
+  "UnitXP",
+  "UnitXPMax",
+  "UpdateAddOnCPUUsage",
+}
+
+function DataToColor:ReportMissingApi()
+  local missing = 0
+  for i = 1, #REQUIRED_API do
+    local name = REQUIRED_API[i]
+    if _G[name] == nil then
+      missing = missing + 1
+      DataToColor:Print("missing: " .. name)
+    end
+  end
+  DataToColor:Print("API check done, " .. missing .. " missing (of " .. #REQUIRED_API .. ")")
 end
 
 local GetBuildInfo = GetBuildInfo

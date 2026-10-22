@@ -369,6 +369,7 @@ function DataToColor:RegisterSlashCommands()
     DataToColor:RegisterChatCommand('dcbindings', 'SetDefaultBindings')
     DataToColor:RegisterChatCommand('dcactions', 'CreateSecureButtons')
     DataToColor:RegisterChatCommand('dccache', 'ToggleBitCache')
+    DataToColor:RegisterChatCommand('dcapi', 'ReportMissingApi')
 end
 
 function DataToColor:ToggleBitCache()
@@ -1039,7 +1040,7 @@ function DataToColor:CreateFrames()
             DataToColor.uiErrorMessage = 0
 
             Pixel(int, DataToColor:CastingInfoSpellId(DataToColor.C.unitPlayer), 53)                                                                                                                                                                               -- SpellId being cast
-            Pixel(int, DataToColor:getAvgEquipmentDurabilityCached() * 100 + ((DataToColor.C.CHARACTER_CLASS_ID == 2 and UnitPower(DataToColor.C.unitPlayer, PowerType.HolyPower) or GetComboPoints(DataToColor.C.unitPlayer, DataToColor.C.unitTarget)) or 0), 54)                                                                                                                                                                                                                                                -- for paladin holy power or combo points
+            Pixel(int, DataToColor:getAvgEquipmentDurabilityCached() * 100 + (DataToColor.Visible((DataToColor.C.CHARACTER_CLASS_ID == 2 and UnitPower(DataToColor.C.unitPlayer, PowerType.HolyPower) or GetComboPoints(DataToColor.C.unitPlayer, DataToColor.C.unitTarget)), 0) or 0), 54)                                                                                                                                                                                                                                                -- for paladin holy power or combo points
 
             local playerBuffCount = DataToColor:populateAuraTimer(UnitBuff, DataToColor.C.unitPlayer, DataToColor.playerBuffTime)
             local playerDebuffCount = DataToColor:populateAuraTimer(UnitDebuff, DataToColor.C.unitPlayer, DataToColor.playerDebuffTime)
