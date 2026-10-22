@@ -48,6 +48,8 @@ end
 local Load = select(2, ...)
 local DataToColor = unpack(Load)
 
+local IsSecret = DataToColor.IsSecret
+
 local band = bit.band
 local rshift = bit.rshift
 local floor = math.floor
@@ -785,6 +787,10 @@ function DataToColor:CreateFrames()
     end
 
     local function Pixel(func, value, slot)
+        -- Hidden (secret) values are not sent; the cell stays 0.
+        if IsSecret(value) then
+            value = 0
+        end
         if valueCache[slot] ~= value then
             valueCache[slot] = value
             local frame = frames[slot]
@@ -875,7 +881,7 @@ function DataToColor:CreateFrames()
 
                 for index = 1, 6 do
                     local startTime = GetRuneCooldown(index)
-                    if startTime == 0 then
+                    if not IsSecret(startTime) and startTime == 0 then
                         numRunes = numRunes + 1
                         local runeType = GetRuneType(index)
                         if runeType == 1 then

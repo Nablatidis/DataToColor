@@ -332,6 +332,10 @@ end
 
 function DataToColor:CastingInfoSpellId(unitId)
     local _, _, _, startTime, endTime, _, _, _, spellID = DataToColor.UnitCastingInfo(unitId)
+    local IsSecret = DataToColor.IsSecret
+    if IsSecret(spellID) or IsSecret(startTime) or IsSecret(endTime) then
+        return 0
+    end
 
     if spellID then
         if unitId == DataToColor.C.unitPlayer and startTime ~= DataToColor.lastCastStartTime then
@@ -343,6 +347,9 @@ function DataToColor:CastingInfoSpellId(unitId)
     end
 
     local _, _, _, startTime, endTime, _, _, spellID = DataToColor.UnitChannelInfo(unitId)
+    if IsSecret(spellID) or IsSecret(startTime) or IsSecret(endTime) then
+        return 0
+    end
     if spellID then
         if unitId == DataToColor.C.unitPlayer and startTime ~= DataToColor.lastCastStartTime then
             DataToColor.lastCastStartTime = startTime
@@ -459,6 +466,10 @@ function DataToColor:areSpellsInRange()
 end
 
 local function NormalizeUsable(usable, notEnough)
+  -- Hidden (secret) values count as not usable
+  if DataToColor.IsSecret(usable) or DataToColor.IsSecret(notEnough) then
+    return false, false
+  end
   -- Classic/vanilla style: usable = 1/nil, notEnough = 1/nil
   if usable == 1 then usable = true end
   if usable == nil then usable = false end
@@ -471,7 +482,7 @@ end
 
 local function GetActionSpellGcdMs(spellId)
   if not spellId then return 0 end
-  local base = select(2, GetSpellBaseCooldown(spellId))
+  local base = DataToColor.Visible(select(2, GetSpellBaseCooldown(spellId)), nil)
   return base or 1500 -- legacy fallback you already used
 end
 
@@ -480,6 +491,10 @@ function DataToColor:isActionUseable(min, max)
   local isUsableBits = 0
   for slot = min, max do
     local start, duration, enabled = GetActionCooldown(slot)
+    -- Hidden (secret) cooldowns: treat the slot as not ready and don't track it
+    if DataToColor.IsSecret(start) or DataToColor.IsSecret(duration) or DataToColor.IsSecret(enabled) then
+      start, duration, enabled = 1, 0, 0
+    end
 
     local actionType, id, _ = GetActionInfo(slot)
 
