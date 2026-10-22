@@ -305,6 +305,10 @@ function DataToColor:UnfilteredCombatEvent(event, ...)
     if CombatLogGetCurrentEventInfo then
         return DataToColor:OnCombatEvent(CombatLogGetCurrentEventInfo())
     end
+    -- No combat log data in this client (e.g. WoW Forever): skip
+    if select('#', ...) == 0 then
+        return
+    end
     -- 4.3.4 and earlier
     return DataToColor:OnCombatEvent(...)
 end

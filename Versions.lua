@@ -40,6 +40,7 @@ do
     local inRange = C_Spell.IsSpellInRange
     G.IsSpellInRange = function(spell, unit)
       local r = inRange(spell, unit)
+      if DataToColor.IsSecret(r) then return nil end -- hidden by the game
       if r == true then return 1 elseif r == false then return 0 end
       return nil
     end

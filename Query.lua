@@ -143,13 +143,13 @@ function DataToColor:Bits1()
         (IsSwimming() and 2 or 0) ^ 11 +
         (DataToColor:PetHappy() and 2 or 0) ^ 12 +
         (DataToColor:HasAmmo() and 2 or 0) ^ 13 +
-        (UnitAffectingCombat(DataToColor.C.unitPlayer) and 2 or 0) ^ 14 +
+        (DataToColor.Visible(UnitAffectingCombat(DataToColor.C.unitPlayer), false) and 2 or 0) ^ 14 +
         (DataToColor:IsUnitsTargetIsPlayerOrPet(DataToColor.C.unitTarget, DataToColor.C.unitTargetTarget) and 2 or 0) ^ 15 +
-        (IsAutoRepeatSpell(DataToColor.C.Spell.AutoShotId) and 2 or 0) ^ 16 +
+        (DataToColor.Visible(IsAutoRepeatSpell(DataToColor.C.Spell.AutoShotId), false) and 2 or 0) ^ 16 +
         (UnitExists(DataToColor.C.unitTarget) and 2 or 0) ^ 17 +
         (IsMounted() and 2 or 0) ^ 18 +
-        (IsAutoRepeatSpell(DataToColor.C.Spell.ShootId) and 2 or 0) ^ 19 +
-        (IsCurrentSpell(DataToColor.C.Spell.AttackId) and 2 or 0) ^ 20 +
+        (DataToColor.Visible(IsAutoRepeatSpell(DataToColor.C.Spell.ShootId), false) and 2 or 0) ^ 19 +
+        (DataToColor.Visible(IsCurrentSpell(DataToColor.C.Spell.AttackId), false) and 2 or 0) ^ 20 +
         (UnitIsPlayer(DataToColor.C.unitTarget) and 2 or 0) ^ 21 +
         (DataToColor:UnitIsTapDenied(DataToColor.C.unitTarget) and 2 or 0) ^ 22 +
         (IsFalling() and 2 or 0) ^ 23

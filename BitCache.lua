@@ -321,9 +321,9 @@ end
 
 -- Update auto-attack/spell states
 local function UpdateSpellStateCache()
-    bits1Cache.autoShotActive = IsAutoRepeatSpell(DataToColor.C.Spell.AutoShotId) or false
-    bits1Cache.shootActive = IsAutoRepeatSpell(DataToColor.C.Spell.ShootId) or false
-    bits1Cache.attackActive = IsCurrentSpell(DataToColor.C.Spell.AttackId) or false
+    bits1Cache.autoShotActive = DataToColor.Visible(IsAutoRepeatSpell(DataToColor.C.Spell.AutoShotId), false) or false
+    bits1Cache.shootActive = DataToColor.Visible(IsAutoRepeatSpell(DataToColor.C.Spell.ShootId), false) or false
+    bits1Cache.attackActive = DataToColor.Visible(IsCurrentSpell(DataToColor.C.Spell.AttackId), false) or false
 end
 
 -- Update breath/mirror timer
